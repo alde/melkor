@@ -1,0 +1,11 @@
+address: 127.0.0.1
+port: 8080
+
+loglevel: info
+logformat: json
+
+owner: the_team
+
+aws_region: us-east-1
+
+crawl_interval: 3600

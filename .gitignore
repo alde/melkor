@@ -1,0 +1,5 @@
+vendor/*
+/melkor
+docker/melkor
+coverage.out
+coverage-all.out
