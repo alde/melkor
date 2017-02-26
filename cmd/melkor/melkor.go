@@ -12,7 +12,7 @@ import (
 	"github.com/alde/melkor/server"
 	"github.com/alde/melkor/version"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/braintree/manners"
 )
 

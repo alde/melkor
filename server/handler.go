@@ -7,7 +7,7 @@ import (
 	"github.com/alde/melkor/config"
 	"github.com/alde/melkor/version"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/gorilla/mux"
 )
 
