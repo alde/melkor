@@ -12,4 +12,3 @@ before_install:
 script:
  - make melkor
  - overalls -project=github.com/alde/melkor -covermode=count
- - goveralls -coverprofile=overalls.coverprofile -service travis-ci

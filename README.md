@@ -1,7 +1,6 @@
 # Melkor
 
 [![Build Status][travis-image]](https://travis-ci.org/alde/melkor)
-[![Coverage Status][coveralls-image]](https://coveralls.io/r/alde/melkor?branch=master)
 [![Go Report][goreport-image]](https://goreportcard.com/report/github.com/alde/melkor)
 
 ## Purpose
@@ -36,5 +35,4 @@ Get a single item:
 [Licence](./LICENSE)
 
 [travis-image]: https://img.shields.io/travis/alde/melkor.svg?style=flat
-[coveralls-image]: https://img.shields.io/coveralls/alde/melkor.svg?style=flat
 [goreport-image]: https://goreportcard.com/badge/github.com/alde/melkor
