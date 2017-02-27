@@ -73,12 +73,12 @@ func (mc *Crawler) DoCrawl() error {
 func (mc *Crawler) List(limit int, expand bool) interface{} {
 	mc.ListFnInvoked = true
 	if mc.ListFn == nil {
-		return mc.DefaultListFn(limit, expand)
+		return mc.defaultListFn(limit, expand)
 	}
 	return mc.ListFn(limit, expand)
 }
 
-func (mc *Crawler) DefaultListFn(limit int, expand bool) interface{} {
+func (mc *Crawler) defaultListFn(limit int, expand bool) interface{} {
 	if len(mc.Data) == 0 {
 		return []string{}
 	}
@@ -107,12 +107,12 @@ func (mc *Crawler) DefaultListFn(limit int, expand bool) interface{} {
 func (mc *Crawler) Get(id string) map[string]interface{} {
 	mc.GetFnInvoked = true
 	if mc.GetFn == nil {
-		return mc.DefaultGetFn(id)
+		return mc.defaultGetFn(id)
 	}
 	return mc.GetFn(id)
 }
 
-func (mc *Crawler) DefaultGetFn(id string) map[string]interface{} {
+func (mc *Crawler) defaultGetFn(id string) map[string]interface{} {
 	for _, d := range mc.Data {
 		if d["id"] == id {
 			return d

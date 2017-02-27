@@ -2,20 +2,23 @@ package mock
 
 import "github.com/aws/aws-sdk-go/service/ec2"
 
+// The EC2Client struct holds the mock implementation of the EC2Client, to
+// facilitate testing
 type EC2Client struct {
 	DescribeInstancesFn        func(*ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error)
 	DescribeInstancesFnInvoked bool
 }
 
+// DescribeInstances is a mock implementation of ec2.DescribeInstances
 func (m *EC2Client) DescribeInstances(params *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 	m.DescribeInstancesFnInvoked = true
 	if m.DescribeInstancesFn == nil {
-		return m.DefaultDescribeInstancesFn(params)
+		return m.defaultDescribeInstancesFn(params)
 	}
 	return m.DescribeInstancesFn(params)
 }
 
-func (m *EC2Client) DefaultDescribeInstancesFn(params *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
+func (m *EC2Client) defaultDescribeInstancesFn(params *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 	instances := []*ec2.Instance{
 		{},
 		{},

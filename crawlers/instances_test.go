@@ -151,7 +151,7 @@ func Test_DoCrawl_Fail(t *testing.T) {
 	c := &config.Config{}
 	mc := &mock.EC2Client{
 		DescribeInstancesFn: func(*ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
-			return nil, errors.New("Something went terribly wrong.")
+			return nil, errors.New("something went terribly wrong")
 		},
 	}
 	ic := &InstancesCrawler{
