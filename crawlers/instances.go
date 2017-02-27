@@ -5,11 +5,11 @@ import (
 
 	"github.com/alde/melkor/config"
 
-	"github.com/sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/fatih/structs"
+	"github.com/sirupsen/logrus"
 )
 
 type ec2Client interface {

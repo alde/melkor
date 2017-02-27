@@ -35,19 +35,19 @@ type route struct {
 
 func routes(h *Handler) []route {
 	return []route{
-		route{
+		{
 			Name:    "ListResources",
 			Method:  "GET",
 			Pattern: "/api/v1/aws/{resource}",
 			Handler: h.ListAWSResources(),
 		},
-		route{
+		{
 			Name:    "GetSingleResource",
 			Method:  "GET",
 			Pattern: "/api/v1/aws/{resource}/{id}",
 			Handler: h.GetSingleAWSResource(),
 		},
-		route{
+		{
 			Name:    "ServiceMetadata",
 			Method:  "GET",
 			Pattern: "/service-metadata",

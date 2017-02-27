@@ -41,15 +41,15 @@ func setupCrawler() *InstancesCrawler {
 	return &InstancesCrawler{
 		count: 3,
 		instances: []*ec2.Instance{
-			&ec2.Instance{
+			{
 				InstanceId:       aws.String("i-0"),
 				PrivateIpAddress: aws.String("10.0.0.1"),
 			},
-			&ec2.Instance{
+			{
 				InstanceId:       aws.String("i-1"),
 				PrivateIpAddress: aws.String("10.0.0.2"),
 			},
-			&ec2.Instance{
+			{
 				InstanceId:       aws.String("i-2"),
 				PrivateIpAddress: aws.String("10.0.0.3"),
 			},

@@ -12,8 +12,8 @@ import (
 	"github.com/alde/melkor/server"
 	"github.com/alde/melkor/version"
 
-	"github.com/sirupsen/logrus"
 	"github.com/braintree/manners"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {

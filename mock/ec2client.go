@@ -17,8 +17,8 @@ func (m *EC2Client) DescribeInstances(params *ec2.DescribeInstancesInput) (*ec2.
 
 func (m *EC2Client) DefaultDescribeInstancesFn(params *ec2.DescribeInstancesInput) (*ec2.DescribeInstancesOutput, error) {
 	instances := []*ec2.Instance{
-		&ec2.Instance{},
-		&ec2.Instance{},
+		{},
+		{},
 	}
 	reservation := &ec2.Reservation{
 		Instances: instances,

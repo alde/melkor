@@ -7,8 +7,8 @@ import (
 	"github.com/alde/melkor/config"
 	"github.com/alde/melkor/version"
 
-	"github.com/sirupsen/logrus"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 // Handler holds the server context
