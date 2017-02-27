@@ -16,8 +16,10 @@ PACKAGES=$(shell go list ./... | grep -v /vendor/)
 
 all: test
 
-
 test: melkor
+	go test $(shell glide novendor)
+
+coverage:
 	echo "mode: count" > coverage-all.out
 	$(foreach pkg,$(PACKAGES),\
 		go test -coverprofile=coverage.out -covermode=count $(pkg);\
