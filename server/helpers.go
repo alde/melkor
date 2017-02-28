@@ -33,3 +33,31 @@ func parseLimit(r *http.Request) (int, error) {
 	}
 	return strconv.Atoi(l)
 }
+
+func applyLimit(data []string, limit int) []string {
+	if limit == 0 {
+		return data
+	}
+	var collection []string
+	for idx, el := range data {
+		if idx == limit {
+			break
+		}
+		collection = append(collection, el)
+	}
+	return collection
+}
+
+func applyLimitExpanded(data []map[string]interface{}, limit int) []map[string]interface{} {
+	if limit == 0 {
+		return data
+	}
+	var collection []map[string]interface{}
+	for idx, el := range data {
+		if idx == limit {
+			break
+		}
+		collection = append(collection, el)
+	}
+	return collection
+}

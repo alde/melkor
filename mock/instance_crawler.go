@@ -13,8 +13,11 @@ type InstanceCrawler struct {
 	DoCrawlFn        func() error
 	DoCrawlFnInvoked bool
 
-	ListFn        func(int, bool) interface{}
+	ListFn        func() []string
 	ListFnInvoked bool
+
+	ListExpandedFn        func() []map[string]interface{}
+	ListExpandedFnInvoked bool
 
 	GetFn        func(string) map[string]interface{}
 	GetFnInvoked bool
@@ -52,35 +55,38 @@ func (mc *InstanceCrawler) DoCrawl() error {
 }
 
 // List resources
-func (mc *InstanceCrawler) List(limit int, expand bool) interface{} {
+func (mc *InstanceCrawler) List() []string {
 	mc.ListFnInvoked = true
 	if mc.ListFn == nil {
-		return mc.defaultListFn(limit, expand)
+		return mc.defaultListFn()
 	}
-	return mc.ListFn(limit, expand)
+	return mc.ListFn()
 }
 
-func (mc *InstanceCrawler) defaultListFn(limit int, expand bool) interface{} {
+// ListExpanded resources
+func (mc *InstanceCrawler) ListExpanded() []map[string]interface{} {
+	mc.ListFnInvoked = true
+	if mc.ListFn == nil {
+		return mc.defaultListExpandedFn()
+	}
+	return mc.ListExpandedFn()
+}
+
+func (mc *InstanceCrawler) defaultListFn() []string {
 	if len(mc.Data) == 0 {
 		return []string{}
 	}
-	if expand {
-		var data []map[string]interface{}
-		for idx, d := range mc.Data {
-			if limit > 0 && idx == limit {
-				break
-			}
-			data = append(data, d)
-		}
-		return data
-	}
-
 	var data []string
-	for idx, d := range mc.Data {
-		if limit > 0 && idx == limit {
-			break
-		}
+	for _, d := range mc.Data {
 		data = append(data, d["InstanceId"].(string))
+	}
+	return data
+}
+
+func (mc *InstanceCrawler) defaultListExpandedFn() []map[string]interface{} {
+	var data []map[string]interface{}
+	for _, d := range mc.Data {
+		data = append(data, d)
 	}
 	return data
 }

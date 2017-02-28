@@ -74,14 +74,21 @@ func (i *InstancesCrawler) DoCrawl() error {
 }
 
 // List instances
-func (i *InstancesCrawler) List(limit int, expand bool) interface{} {
-	if i.count == 0 {
-		return []string{}
+func (i *InstancesCrawler) List() []string {
+	var data []string
+	for _, ins := range i.instances {
+		data = append(data, aws.StringValue(ins.InstanceId))
 	}
-	if expand {
-		return i.listExpanded(limit)
+	return data
+}
+
+// ListExpanded expands the result
+func (i *InstancesCrawler) ListExpanded() []map[string]interface{} {
+	var data []map[string]interface{}
+	for _, ins := range i.instances {
+		data = append(data, structs.Map(ins))
 	}
-	return i.listUnexpanded(limit)
+	return data
 }
 
 // Get returns a single instance by id
@@ -97,26 +104,4 @@ func (i *InstancesCrawler) Get(id string) map[string]interface{} {
 // Count the number of instances crawled
 func (i *InstancesCrawler) Count() int {
 	return i.count
-}
-
-func (i *InstancesCrawler) listUnexpanded(limit int) []string {
-	var data []string
-	for idx, ins := range i.instances {
-		if limit > 0 && idx == limit {
-			break
-		}
-		data = append(data, *ins.InstanceId)
-	}
-	return data
-}
-
-func (i *InstancesCrawler) listExpanded(limit int) []map[string]interface{} {
-	var data []map[string]interface{}
-	for idx, ins := range i.instances {
-		if limit > 0 && idx == limit {
-			break
-		}
-		data = append(data, structs.Map(ins))
-	}
-	return data
 }

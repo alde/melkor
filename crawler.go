@@ -9,7 +9,8 @@ import (
 type Crawler interface {
 	DoCrawl() error
 	Resource() string
-	List(limit int, expand bool) interface{}
+	List() []string
+	ListExpanded() []map[string]interface{}
 	Get(id string) map[string]interface{}
 	LastCrawled() time.Time
 	Count() int

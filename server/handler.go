@@ -43,8 +43,15 @@ func (h *Handler) ListAWSResources() http.HandlerFunc {
 
 		expand := r.FormValue("_expand") == "true"
 		logrus.WithFields(logrus.Fields{"resource": resource, "limit": limit, "expand": expand}).Debug("Listing resources")
-		data := crawler.List(limit, expand)
+		if expand {
+			data := crawler.ListExpanded()
 
+			data = applyLimitExpanded(data, limit)
+			writeJSON(http.StatusOK, data, w)
+			return
+		}
+		data := crawler.List()
+		data = applyLimit(data, limit)
 		writeJSON(http.StatusOK, data, w)
 	}
 }

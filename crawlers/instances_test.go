@@ -60,7 +60,7 @@ func setupCrawler() *InstancesCrawler {
 func Test_List_Expanded(t *testing.T) {
 	ic := setupCrawler()
 
-	actual := ic.List(0, true).([]map[string]interface{})
+	actual := ic.ListExpanded()
 	aLen := len(actual)
 	assert.Equal(t, aLen, 3)
 	for i := 0; i < aLen; i++ {
@@ -74,7 +74,7 @@ func Test_List_Expanded(t *testing.T) {
 func Test_List_Unexpanded(t *testing.T) {
 	ic := setupCrawler()
 
-	actual := ic.List(0, false).([]string)
+	actual := ic.List()
 	aLen := len(actual)
 	assert.Equal(t, aLen, 3)
 	for i := 0; i < aLen; i++ {
@@ -85,33 +85,8 @@ func Test_List_Unexpanded(t *testing.T) {
 func Test_List_Empty(t *testing.T) {
 	ic := &InstancesCrawler{count: 0}
 
-	actual := ic.List(0, false).([]string)
+	actual := ic.List()
 	assert.Empty(t, actual, "Should be empty")
-}
-
-func Test_List_Expanded_Limit(t *testing.T) {
-	ic := setupCrawler()
-
-	actual := ic.List(1, true).([]map[string]interface{})
-	aLen := len(actual)
-	assert.Equal(t, aLen, 1)
-	for i := 0; i < aLen; i++ {
-		assert.Equal(
-			t,
-			aws.StringValue(actual[i]["PrivateIpAddress"].(*string)),
-			fmt.Sprintf("10.0.0.%d", i+1))
-	}
-}
-
-func Test_List_Unexpanded_Limit(t *testing.T) {
-	ic := setupCrawler()
-
-	actual := ic.List(1, false).([]string)
-	aLen := len(actual)
-	assert.Equal(t, aLen, 1)
-	for i := 0; i < aLen; i++ {
-		assert.Equal(t, actual[i], fmt.Sprintf("i-%d", i))
-	}
 }
 
 func Test_Get(t *testing.T) {
