@@ -1,12 +1,9 @@
 package mock
 
-import (
-	"fmt"
-	"time"
-)
+import "time"
 
-// The Crawler mock struct holds the mocked implementation for the crawler interface
-type Crawler struct {
+// The InstanceCrawler mock struct holds the mocked implementation for the crawler interface
+type InstanceCrawler struct {
 	ResourceFn        func() string
 	ResourceFnInvoked bool
 
@@ -33,23 +30,8 @@ func EmptyCrawlerData() []map[string]interface{} {
 	return []map[string]interface{}{}
 }
 
-// FullCrawlerData is a mock with some data
-func FullCrawlerData() []map[string]interface{} {
-	var data []map[string]interface{}
-	for i := 0; i <= 3; i++ {
-		inner := make(map[string]interface{})
-
-		inner["id"] = fmt.Sprintf("m-%d", i)
-		inner["name"] = fmt.Sprintf("Mock %d", i)
-		inner["region"] = "eu-west-1"
-
-		data = append(data, inner)
-	}
-	return data
-}
-
 // Resource identifies the name of the crawled resource
-func (mc *Crawler) Resource() string {
+func (mc *InstanceCrawler) Resource() string {
 	mc.ResourceFnInvoked = true
 	if mc.ResourceFn == nil {
 		return "Mock"
@@ -58,19 +40,19 @@ func (mc *Crawler) Resource() string {
 }
 
 // LastCrawled is the timestamp of the most recent crawl
-func (mc *Crawler) LastCrawled() time.Time {
+func (mc *InstanceCrawler) LastCrawled() time.Time {
 	mc.LastCrawledFnInvoked = true
 	return mc.LastCrawledFn()
 }
 
 // DoCrawl handles the crawling
-func (mc *Crawler) DoCrawl() error {
+func (mc *InstanceCrawler) DoCrawl() error {
 	mc.DoCrawlFnInvoked = true
 	return mc.DoCrawl()
 }
 
 // List resources
-func (mc *Crawler) List(limit int, expand bool) interface{} {
+func (mc *InstanceCrawler) List(limit int, expand bool) interface{} {
 	mc.ListFnInvoked = true
 	if mc.ListFn == nil {
 		return mc.defaultListFn(limit, expand)
@@ -78,7 +60,7 @@ func (mc *Crawler) List(limit int, expand bool) interface{} {
 	return mc.ListFn(limit, expand)
 }
 
-func (mc *Crawler) defaultListFn(limit int, expand bool) interface{} {
+func (mc *InstanceCrawler) defaultListFn(limit int, expand bool) interface{} {
 	if len(mc.Data) == 0 {
 		return []string{}
 	}
@@ -98,13 +80,13 @@ func (mc *Crawler) defaultListFn(limit int, expand bool) interface{} {
 		if limit > 0 && idx == limit {
 			break
 		}
-		data = append(data, d["id"].(string))
+		data = append(data, d["InstanceId"].(string))
 	}
 	return data
 }
 
 // Get returns a single resource by id
-func (mc *Crawler) Get(id string) map[string]interface{} {
+func (mc *InstanceCrawler) Get(id string) map[string]interface{} {
 	mc.GetFnInvoked = true
 	if mc.GetFn == nil {
 		return mc.defaultGetFn(id)
@@ -112,9 +94,9 @@ func (mc *Crawler) Get(id string) map[string]interface{} {
 	return mc.GetFn(id)
 }
 
-func (mc *Crawler) defaultGetFn(id string) map[string]interface{} {
+func (mc *InstanceCrawler) defaultGetFn(id string) map[string]interface{} {
 	for _, d := range mc.Data {
-		if d["id"] == id {
+		if d["InstanceId"] == id {
 			return d
 		}
 	}
@@ -122,7 +104,7 @@ func (mc *Crawler) defaultGetFn(id string) map[string]interface{} {
 }
 
 // Count the number of resources crawled
-func (mc *Crawler) Count() int {
+func (mc *InstanceCrawler) Count() int {
 	mc.CountFnInvoked = true
 	return mc.CountFn()
 }

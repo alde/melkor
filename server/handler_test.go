@@ -10,6 +10,7 @@ import (
 
 	"github.com/alde/melkor"
 	"github.com/alde/melkor/config"
+	"github.com/alde/melkor/fixtures"
 	"github.com/alde/melkor/mock"
 
 	"github.com/gorilla/mux"
@@ -32,7 +33,7 @@ func Test_ListAWSResources_Unknown(t *testing.T) {
 func setupListAWSResources(data []map[string]interface{}) (*mux.Router, *httptest.ResponseRecorder) {
 	m := mux.NewRouter()
 	config := &config.Config{}
-	mc := &mock.Crawler{Data: data}
+	mc := &mock.InstanceCrawler{Data: data}
 	coll := melkor.Crawlers{mc.Resource(): mc}
 	h := NewHandler(config, coll)
 	m.HandleFunc("/api/v1/aws/{resource}", h.ListAWSResources())
@@ -54,13 +55,13 @@ func Test_ListAWSResources_Empty(t *testing.T) {
 }
 
 func Test_ListAWSResources_All(t *testing.T) {
-	m, wr := setupListAWSResources(mock.FullCrawlerData())
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(4))
 
 	r, _ := http.NewRequest("GET", "/api/v1/aws/mock", nil)
 	m.ServeHTTP(wr, r)
 
 	assert.Equal(t, wr.Code, http.StatusOK)
-	expected := []string{"m-0", "m-1", "m-2", "m-3"}
+	expected := []string{"i-0", "i-1", "i-2", "i-3"}
 	var actual []string
 	err := json.Unmarshal(wr.Body.Bytes(), &actual)
 	assert.Nil(t, err)
@@ -68,14 +69,14 @@ func Test_ListAWSResources_All(t *testing.T) {
 }
 
 func Test_ListAWSResources_Limit(t *testing.T) {
-	m, wr := setupListAWSResources(mock.FullCrawlerData())
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
 
 	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_limit=1", nil)
 	m.ServeHTTP(wr, r)
 
 	assert.Equal(t, wr.Code, http.StatusOK)
 
-	expected := []string{"m-0"}
+	expected := []string{"i-0"}
 	var actual []string
 	err := json.Unmarshal(wr.Body.Bytes(), &actual)
 	assert.Nil(t, err)
@@ -83,7 +84,7 @@ func Test_ListAWSResources_Limit(t *testing.T) {
 }
 
 func Test_ListAWSResources_LimitFail(t *testing.T) {
-	m, wr := setupListAWSResources(mock.FullCrawlerData())
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
 
 	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_limit=one", nil)
 	m.ServeHTTP(wr, r)
@@ -98,29 +99,40 @@ func Test_ListAWSResources_LimitFail(t *testing.T) {
 }
 
 func Test_ListAWSResources_Expand(t *testing.T) {
-	m, wr := setupListAWSResources(mock.FullCrawlerData())
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
 
 	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true", nil)
 	m.ServeHTTP(wr, r)
 
-	assert.Equal(t, wr.Code, http.StatusOK)
+	assert.Equal(t, http.StatusOK, wr.Code)
 
-	expected := []map[string]interface{}{
-		{"id": "m-0", "name": "Mock 0", "region": "eu-west-1"},
-		{"id": "m-1", "name": "Mock 1", "region": "eu-west-1"},
-		{"id": "m-2", "name": "Mock 2", "region": "eu-west-1"},
-		{"id": "m-3", "name": "Mock 3", "region": "eu-west-1"},
-	}
+	expected := fixtures.ExpectedFullResponse(3)
+	actual := strings.TrimRight(wr.Body.String(), "\n")
+
+	assert.Equal(t, expected, actual)
+}
+
+func Test_ListAWSResources_Expand_Limit(t *testing.T) {
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
+
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true&_limit=1", nil)
+	m.ServeHTTP(wr, r)
+
+	assert.Equal(t, http.StatusOK, wr.Code)
+
 	var actual []map[string]interface{}
 	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
 	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Len(t, actual, 1)
+	assert.Contains(t, actual[0], "InstanceId")
+	assert.Equal(t, actual[0]["InstanceId"], "i-0")
 }
 
 func setupGetSingleAWSResource() (*mux.Router, *httptest.ResponseRecorder) {
 	m := mux.NewRouter()
 	config := &config.Config{}
-	mc := &mock.Crawler{Data: mock.FullCrawlerData()}
+	mc := &mock.InstanceCrawler{Data: fixtures.FullCrawlerData(3)}
 	coll := melkor.Crawlers{mc.Resource(): mc}
 	h := NewHandler(config, coll)
 	m.HandleFunc("/api/v1/aws/{resource}/{id}", h.GetSingleAWSResource())
@@ -132,18 +144,17 @@ func setupGetSingleAWSResource() (*mux.Router, *httptest.ResponseRecorder) {
 func Test_GetSingleAWSResource(t *testing.T) {
 	m, wr := setupGetSingleAWSResource()
 
-	r, _ := http.NewRequest("GET", "/api/v1/aws/mock/m-1", nil)
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock/i-1", nil)
 	m.ServeHTTP(wr, r)
 
-	assert.Equal(t, wr.Code, http.StatusOK)
+	assert.Equal(t, http.StatusOK, wr.Code)
 
-	expected := map[string]interface{}{
-		"id": "m-1", "name": "Mock 1", "region": "eu-west-1",
-	}
 	var actual map[string]interface{}
 	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
 	assert.Nil(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Contains(t, actual, "InstanceId")
+	assert.Equal(t, actual["InstanceId"], "i-1")
 }
 
 func Test_GetSingleAWSResource_NotFound(t *testing.T) {
@@ -179,7 +190,7 @@ func Test_GetSingleAWSResource_UnknownResource(t *testing.T) {
 func Test_ServiceMetadata(t *testing.T) {
 	m := mux.NewRouter()
 	config := &config.Config{}
-	mc := &mock.Crawler{
+	mc := &mock.InstanceCrawler{
 		CountFn: func() int {
 			return 20
 		},
