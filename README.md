@@ -25,6 +25,10 @@ Get a list of expanded items:
 
     /v1/aws/{collection}?_expand=true
 
+Get a filtered list of items (only works together with _expand):
+
+    /v1/aws/{collection}?_expand=true&_filter=(Tags.Environment=production)
+
 Get a single item:
 
     /v1/aws/{collection}/{id}

@@ -125,8 +125,85 @@ func Test_ListAWSResources_Expand_Limit(t *testing.T) {
 
 	assert.Nil(t, err)
 	assert.Len(t, actual, 1)
+	for _, a := range actual {
+		assert.Contains(t, a, "InstanceId")
+		assert.Equal(t, a["InstanceId"], "i-0")
+		assert.Contains(t, a, "Tags")
+		for _, tag := range a["Tags"].([]interface{}) {
+			tag0 := tag.(map[string]interface{})
+			key := tag0["Key"].(string)
+			value := tag0["Value"].(string)
+			assert.Contains(t, tag0, key)
+			assert.Equal(t, value, tag0[key])
+		}
+	}
+}
+
+func Test_ListAWSResources_Filter(t *testing.T) {
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
+
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true&_filter=(Tags.Team:team2)", nil)
+	m.ServeHTTP(wr, r)
+
+	assert.Equal(t, http.StatusOK, wr.Code)
+
+	var actual []map[string]interface{}
+	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
+	assert.Nil(t, err)
+	assert.Len(t, actual, 1)
 	assert.Contains(t, actual[0], "InstanceId")
-	assert.Equal(t, actual[0]["InstanceId"], "i-0")
+	assert.Equal(t, actual[0]["InstanceId"], "i-2")
+}
+
+func Test_ListAWSResources_Filter_ValueInsensitive(t *testing.T) {
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
+
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true&_filter=(Tags.Team:TEAM2)", nil)
+	m.ServeHTTP(wr, r)
+
+	assert.Equal(t, http.StatusOK, wr.Code)
+
+	var actual []map[string]interface{}
+	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
+	assert.Nil(t, err)
+	assert.Len(t, actual, 1)
+	assert.Contains(t, actual[0], "InstanceId")
+	assert.Equal(t, actual[0]["InstanceId"], "i-2")
+}
+
+func Test_ListAWSResources_Filter_InvalidFormat(t *testing.T) {
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
+
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true&_filter=Tags.Team:TEAM2", nil)
+	m.ServeHTTP(wr, r)
+
+	assert.Equal(t, http.StatusInternalServerError, wr.Code)
+
+	var actual map[string]interface{}
+	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
+	assert.Nil(t, err)
+	assert.Contains(t, actual, "error")
+	assert.Contains(t, actual["error"], "invalid format of filter")
+}
+
+func Test_ListAWSResources_Filter_And_Limit(t *testing.T) {
+	m, wr := setupListAWSResources(fixtures.FullCrawlerData(3))
+
+	r, _ := http.NewRequest("GET", "/api/v1/aws/mock?_expand=true&_filter=(Tags.Team:team2)&_limit=1", nil)
+	m.ServeHTTP(wr, r)
+
+	assert.Equal(t, http.StatusOK, wr.Code)
+
+	var actual []map[string]interface{}
+	err := json.Unmarshal(wr.Body.Bytes(), &actual)
+
+	assert.Nil(t, err)
+	assert.Len(t, actual, 1)
+	assert.Contains(t, actual[0], "InstanceId")
+	assert.Equal(t, actual[0]["InstanceId"], "i-2")
 }
 
 func setupGetSingleAWSResource() (*mux.Router, *httptest.ResponseRecorder) {

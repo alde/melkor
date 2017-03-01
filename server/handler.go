@@ -46,7 +46,16 @@ func (h *Handler) ListAWSResources() http.HandlerFunc {
 		if expand {
 			data := crawler.ListExpanded()
 
+			filter := r.FormValue("_filter")
+			if filter != "" {
+				data, err = applyFilter(filter, data)
+				if err != nil {
+					writeError(http.StatusInternalServerError, err.Error(), w)
+					return
+				}
+			}
 			data = applyLimitExpanded(data, limit)
+			logrus.WithField("count", len(data)).Debug("limited data")
 			writeJSON(http.StatusOK, data, w)
 			return
 		}
