@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"github.com/alde/melkor"
 )
 
 var (
@@ -114,34 +116,35 @@ func createAWSResponse(i int, team string) map[string]interface{} {
 		"StateReason":           nil,
 		"StateTransitionReason": "",
 		"SubnetId":              "subnet-11aa22bb",
-		"Tags": []map[string]string{
-			{
-				"Key":   "Name",
-				"Value": fmt.Sprintf("fake-service-%d", i),
-			},
-			{
-				"Key":   "Service",
-				"Value": "fake-service",
-			},
-			{
-				"Key":   "Team",
-				"Value": team,
-			},
-			{
-				"Key":   "Environment",
-				"Value": "staging",
-			},
-		},
-		"VirtualizationType": "hvm",
-		"VpcId":              "vpc-987654321",
+		"Tags":                  tags(i, team),
+		"VirtualizationType":    "hvm",
+		"VpcId":                 "vpc-987654321",
 	}
+}
+
+func tag(key, value string) interface{} {
+	return map[string]interface{}{
+		"Key":   &key,
+		"Value": &value,
+	}
+}
+
+func tags(i int, team string) interface{} {
+	var tags []interface{}
+	tags = append(tags, tag("Name", fmt.Sprintf("fake-service-%d", i)))
+	tags = append(tags, tag("Team", team))
+	tags = append(tags, tag("Service", fmt.Sprintf("fake-service")))
+	tags = append(tags, tag("Environment", "staging"))
+	return tags
 }
 
 // FullCrawlerData returns the full structure of `count` number of instances
 func FullCrawlerData(count int) []map[string]interface{} {
 	var data []map[string]interface{}
 	for i := 0; i < count; i++ {
-		data = append(data, createAWSResponse(i, fmt.Sprintf("team%d", i)))
+		iStr := createAWSResponse(i, fmt.Sprintf("team%d", i))
+		melkor.ModifyTags(iStr["Tags"])
+		data = append(data, iStr)
 	}
 
 	return data

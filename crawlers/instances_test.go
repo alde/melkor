@@ -44,14 +44,32 @@ func setupCrawler() *InstancesCrawler {
 			{
 				InstanceId:       aws.String("i-0"),
 				PrivateIpAddress: aws.String("10.0.0.1"),
+				Tags: []*ec2.Tag{
+					&ec2.Tag{
+						Key:   aws.String("Team"),
+						Value: aws.String("Test1"),
+					},
+				},
 			},
 			{
 				InstanceId:       aws.String("i-1"),
 				PrivateIpAddress: aws.String("10.0.0.2"),
+				Tags: []*ec2.Tag{
+					&ec2.Tag{
+						Key:   aws.String("Team"),
+						Value: aws.String("Test2"),
+					},
+				},
 			},
 			{
 				InstanceId:       aws.String("i-2"),
 				PrivateIpAddress: aws.String("10.0.0.3"),
+				Tags: []*ec2.Tag{
+					&ec2.Tag{
+						Key:   aws.String("Team"),
+						Value: aws.String("Test2"),
+					},
+				},
 			},
 		},
 	}

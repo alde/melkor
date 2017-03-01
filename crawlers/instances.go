@@ -3,6 +3,7 @@ package crawlers
 import (
 	"time"
 
+	"github.com/alde/melkor"
 	"github.com/alde/melkor/config"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -86,7 +87,10 @@ func (i *InstancesCrawler) List() []string {
 func (i *InstancesCrawler) ListExpanded() []map[string]interface{} {
 	var data []map[string]interface{}
 	for _, ins := range i.instances {
-		data = append(data, structs.Map(ins))
+		iStr := structs.Map(ins)
+		melkor.ModifyTags(iStr["Tags"])
+
+		data = append(data, iStr)
 	}
 	return data
 }
